@@ -134,7 +134,7 @@ composer test
 
 ## Support
 
-**Enterprise support available** - Need SLA guarantees, custom integrations, or priority bug fixes? Email jordan.l.partridge@gmail.com
+**Enterprise support available** - Need SLA guarantees, custom integrations, or priority bug fixes? Email jordan@partridge.rocks
 
 **Community** - Open an issue on [GitHub](https://github.com/conduit-ui/connector/issues) or contribute a PR.
 
