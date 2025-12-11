@@ -6,14 +6,14 @@ use ConduitUi\GitHubConnector\Exceptions\GitHubRateLimitException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubResourceNotFoundException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubServerException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubValidationException;
-use ConduitUi\GitHubConnector\GithubConnector;
+use ConduitUi\GitHubConnector\Connector;
 use Saloon\Enums\Method;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\Http\Request;
 
 beforeEach(function () {
-    $this->connector = new GithubConnector('test-token');
+    $this->connector = new Connector('test-token');
 });
 
 it('maps 401 responses to auth exceptions', function () {

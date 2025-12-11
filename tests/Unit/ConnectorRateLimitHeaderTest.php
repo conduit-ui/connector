@@ -2,14 +2,14 @@
 
 use ConduitUi\GitHubConnector\Exceptions\GitHubForbiddenException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubRateLimitException;
-use ConduitUi\GitHubConnector\GithubConnector;
+use ConduitUi\GitHubConnector\Connector;
 use Saloon\Enums\Method;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\Http\Request;
 
 beforeEach(function () {
-    $this->connector = new GithubConnector('test-token');
+    $this->connector = new Connector('test-token');
 });
 
 it('treats string "0" as rate limit exceeded', function () {

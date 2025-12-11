@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(./vendor/bin/pest)",
-      "Bash(composer analyse:*)"
+      "Bash(composer analyse:*)",
+      "Bash(gh search:*)"
     ],
     "deny": []
   }

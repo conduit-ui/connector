@@ -2,7 +2,7 @@
 
 namespace ConduitUi\GitHubConnector;
 
-use ConduitUi\GitHubConnector\Contracts\GithubConnectorInterface;
+use ConduitUi\GitHubConnector\Contracts\ConnectorInterface;
 use ConduitUi\GitHubConnector\Exceptions\GithubAuthException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubForbiddenException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubRateLimitException;
@@ -10,14 +10,14 @@ use ConduitUi\GitHubConnector\Exceptions\GitHubResourceNotFoundException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubServerException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubValidationException;
 use Saloon\Http\Auth\TokenAuthenticator;
-use Saloon\Http\Connector;
+use Saloon\Http\Connector as SaloonConnector;
 use Saloon\Http\Response;
 use Saloon\Traits\Plugins\AcceptsJson;
 
 /**
  * GitHub API connector for Saloon HTTP client.
  */
-class GithubConnector extends Connector implements GithubConnectorInterface
+class Connector extends SaloonConnector implements ConnectorInterface
 {
     use AcceptsJson;
 

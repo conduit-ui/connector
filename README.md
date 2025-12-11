@@ -11,9 +11,9 @@ composer require conduit-ui/github-connector
 ## Usage
 
 ```php
-use ConduitUi\GitHubConnector\GithubConnector;
+use ConduitUi\GitHubConnector\Connector;
 
-$connector = new GithubConnector('your-token');
+$connector = new Connector('your-token');
 
 // Make raw HTTP requests
 $repos = $connector->get('/user/repos');

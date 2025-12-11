@@ -1,25 +1,25 @@
 <?php
 
-use ConduitUi\GitHubConnector\GithubConnector;
+use ConduitUi\GitHubConnector\Connector;
 use Saloon\Enums\Method;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\Http\Request;
 
 beforeEach(function () {
-    $this->connector = new GithubConnector('test-token');
+    $this->connector = new Connector('test-token');
 });
 
 it('can be instantiated with a token', function () {
-    $connector = new GithubConnector('test-token');
+    $connector = new Connector('test-token');
 
-    expect($connector)->toBeInstanceOf(GithubConnector::class);
+    expect($connector)->toBeInstanceOf(Connector::class);
 });
 
 it('can be instantiated without a token', function () {
-    $connector = new GithubConnector;
+    $connector = new Connector;
 
-    expect($connector)->toBeInstanceOf(GithubConnector::class);
+    expect($connector)->toBeInstanceOf(Connector::class);
 });
 
 it('resolves the correct base URL', function () {
