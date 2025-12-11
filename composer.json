@@ -1,5 +1,5 @@
 {
-  "name": "conduit-ui/github-connector",
+  "name": "conduit-ui/connector",
   "description": "Core GitHub API connector with authentication",
   "keywords": [
     "conduit-ui",
