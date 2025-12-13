@@ -74,3 +74,47 @@ jobs:
 
     - name: Run tests with coverage
       run: vendor/bin/pest --coverage --min=100
+
+  security:
+    runs-on: ubuntu-latest
+    name: Security Audit
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Check for security vulnerabilities
+      run: composer audit
+
+  architecture:
+    runs-on: ubuntu-latest
+    name: Architecture Tests
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+
+    - name: Cache Composer packages
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-8.3-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Run architecture tests
+      run: vendor/bin/pest --filter=arch
