@@ -16,6 +16,12 @@ use Saloon\Traits\Plugins\AcceptsJson;
 
 /**
  * GitHub API connector for Saloon HTTP client.
+ *
+ * @method \Saloon\Http\Response get(string $path, array $query = [])
+ * @method \Saloon\Http\Response post(string $path, array $data = [])
+ * @method \Saloon\Http\Response patch(string $path, array $data = [])
+ * @method \Saloon\Http\Response put(string $path, array $data = [])
+ * @method \Saloon\Http\Response delete(string $path)
  */
 class Connector extends SaloonConnector implements ConnectorInterface
 {
