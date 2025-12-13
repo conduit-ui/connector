@@ -113,13 +113,119 @@ $remaining = $response->header('X-RateLimit-Remaining');
 $resetAt = $response->header('X-RateLimit-Reset');
 ```
 
+## Repository Context
+
+The connector maintains a static repository context that ecosystem packages can inherit. Set once, use everywhere.
+
+### Setting Context
+
+```php
+use ConduitUi\GitHubConnector\Connector;
+
+// Set the repo context once
+Connector::forRepo('owner/repo');
+
+// All ecosystem packages now inherit this context
+Issue::all();           // No repo arg needed
+PullRequests::open();   // No repo arg needed
+Commit::latest();       // No repo arg needed
+```
+
+### Accessing Context
+
+```php
+// Get the full repo string (nullable)
+Connector::repo();       // 'owner/repo' or null
+
+// Get the full repo string (throws if not set)
+Connector::requireRepo(); // 'owner/repo' or throws NoRepoContextException
+
+// Get individual parts
+Connector::owner();      // 'owner'
+Connector::repoName();   // 'repo'
+```
+
+### Switching Context
+
+```php
+// Work on first repo
+Connector::forRepo('acme/api');
+Issue::all(); // Issues from acme/api
+
+// Switch to different repo
+Connector::forRepo('acme/web');
+Issue::all(); // Now issues from acme/web
+
+// Clear context entirely
+Connector::clearRepo();
+Connector::repo(); // null
+```
+
+### Error Handling
+
+```php
+use ConduitUi\GitHubConnector\Exceptions\NoRepoContextException;
+
+try {
+    // Throws if no context set
+    $owner = Connector::owner();
+} catch (NoRepoContextException $e) {
+    // "No repository context set. Call Connector::forRepo() first."
+}
+
+// Or check first
+if (Connector::repo() !== null) {
+    $owner = Connector::owner();
+}
+```
+
+### Using in Ecosystem Packages
+
+Packages in the conduit-ui ecosystem can delegate to the connector:
+
+```php
+// In your package (e.g., conduit-ui/issue)
+class Issue
+{
+    public static function forRepo(string $repository): void
+    {
+        Connector::forRepo($repository);
+    }
+
+    public static function all(): Collection
+    {
+        $owner = Connector::owner();
+        $repo = Connector::repoName();
+
+        // Fetch issues using inherited context...
+    }
+}
+```
+
+This creates a unified experience where any package can set or use the context:
+
+```php
+// User can set context via any package
+Issue::forRepo('owner/repo');
+
+// Or directly on connector
+Connector::forRepo('owner/repo');
+
+// Either way, all packages inherit it
+PullRequests::open()->get();
+Commit::since(now()->subWeek());
+```
+
 ## Related Packages
 
 The conduit-ui ecosystem builds on this connector:
 
-- **[conduit-ui/know](https://github.com/conduit-ui/know)** - Domain knowledge for AI agents (how/why/what/remember API)
-
-More packages coming soon.
+- **[conduit-ui/issue](https://github.com/conduit-ui/issue)** - GitHub issue management
+- **[conduit-ui/pr](https://github.com/conduit-ui/pr)** - Pull request operations
+- **[conduit-ui/repo](https://github.com/conduit-ui/repo)** - Repository operations
+- **[conduit-ui/commit](https://github.com/conduit-ui/commit)** - Commit management
+- **[conduit-ui/action](https://github.com/conduit-ui/action)** - GitHub Actions operations
+- **[conduit-ui/know](https://github.com/conduit-ui/know)** - Domain knowledge for AI agents
 
 ## Requirements
 
