@@ -25,6 +25,10 @@ describe('Repository Value Object', function () {
             expect($repo->owner)->toBe('Laravel')
                 ->and($repo->name)->toBe('Framework');
         });
+
+        it('throws for string with multiple slashes since slashes are invalid in repo name', function () {
+            Repository::fromString('owner/repo/with/slashes');
+        })->throws(InvalidRepositoryException::class, 'contains invalid characters');
     });
 
     describe('string conversion', function () {
@@ -43,13 +47,25 @@ describe('Repository Value Object', function () {
     });
 
     describe('equality', function () {
-        it('can check equality', function () {
+        it('returns true for equal repositories', function () {
             $repo1 = new Repository('owner', 'repo');
             $repo2 = new Repository('owner', 'repo');
-            $repo3 = new Repository('owner', 'other');
 
-            expect($repo1->equals($repo2))->toBeTrue()
-                ->and($repo1->equals($repo3))->toBeFalse();
+            expect($repo1->equals($repo2))->toBeTrue();
+        });
+
+        it('returns false for different repo names', function () {
+            $repo1 = new Repository('owner', 'repo');
+            $repo2 = new Repository('owner', 'other');
+
+            expect($repo1->equals($repo2))->toBeFalse();
+        });
+
+        it('returns false for different owners', function () {
+            $repo1 = new Repository('owner', 'repo');
+            $repo2 = new Repository('other', 'repo');
+
+            expect($repo1->equals($repo2))->toBeFalse();
         });
     });
 
@@ -92,6 +108,14 @@ describe('Repository Value Object', function () {
 
         it('throws exception for owner ending with period', function () {
             new Repository('owner.', 'repo');
+        })->throws(InvalidRepositoryException::class, 'cannot start or end with a period');
+
+        it('throws exception for repo name starting with period', function () {
+            new Repository('owner', '.repo');
+        })->throws(InvalidRepositoryException::class, 'cannot start or end with a period');
+
+        it('throws exception for repo name ending with period', function () {
+            new Repository('owner', 'repo.');
         })->throws(InvalidRepositoryException::class, 'cannot start or end with a period');
     });
 
