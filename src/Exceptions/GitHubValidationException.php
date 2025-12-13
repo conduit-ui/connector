@@ -4,22 +4,25 @@ declare(strict_types=1);
 
 namespace ConduitUi\GitHubConnector\Exceptions;
 
+use Saloon\Http\Response;
+
 /**
  * Exception thrown when GitHub API validation fails.
  */
 class GitHubValidationException extends GitHubException
 {
+    /** @var array<int, array<string, mixed>> */
     protected array $validationErrors = [];
 
     public function __construct(
         string $message = 'GitHub API validation failed',
-        $response = null,
+        ?Response $response = null,
         int $code = 422,
         ?\Exception $previous = null
     ) {
         parent::__construct($message, $response, $code, $previous);
 
-        if ($response) {
+        if ($response !== null) {
             $this->parseValidationErrors($response);
         }
 
@@ -30,6 +33,8 @@ class GitHubValidationException extends GitHubException
 
     /**
      * Get the validation errors from GitHub.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function getValidationErrors(): array
     {
@@ -39,14 +44,15 @@ class GitHubValidationException extends GitHubException
     /**
      * Parse validation errors from the GitHub response.
      */
-    protected function parseValidationErrors($response): void
+    protected function parseValidationErrors(Response $response): void
     {
-        if (method_exists($response, 'json')) {
-            $body = $response->json();
+        /** @var mixed $body */
+        $body = $response->json();
 
-            if (is_array($body) && isset($body['errors']) && is_array($body['errors'])) {
-                $this->validationErrors = $body['errors'];
-            }
+        if (is_array($body) && isset($body['errors']) && is_array($body['errors'])) {
+            /** @var array<int, array<string, mixed>> $errors */
+            $errors = $body['errors'];
+            $this->validationErrors = $errors;
         }
     }
 
@@ -57,8 +63,11 @@ class GitHubValidationException extends GitHubException
     {
         $message = parent::getDetailedMessage();
 
-        if (! empty($this->validationErrors)) {
-            $message .= ' Validation errors: '.json_encode($this->validationErrors);
+        if (count($this->validationErrors) > 0) {
+            $encoded = json_encode($this->validationErrors);
+            if ($encoded !== false) {
+                $message .= ' Validation errors: '.$encoded;
+            }
         }
 
         return $message;

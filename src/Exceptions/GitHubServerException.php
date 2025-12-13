@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ConduitUi\GitHubConnector\Exceptions;
 
+use Saloon\Http\Response;
+
 /**
  * Exception thrown when GitHub API returns a server error.
  */
@@ -11,7 +13,7 @@ class GitHubServerException extends GitHubException
 {
     public function __construct(
         string $message = 'GitHub API server error',
-        $response = null,
+        ?Response $response = null,
         int $code = 500,
         ?\Exception $previous = null
     ) {
