@@ -53,8 +53,12 @@ class Connector extends SaloonConnector implements ConnectorInterface
     /**
      * Configure default authentication for requests.
      */
-    protected function defaultAuth(): TokenAuthenticator
+    protected function defaultAuth(): ?TokenAuthenticator
     {
+        if ($this->token === null) {
+            return null;
+        }
+
         return new TokenAuthenticator($this->token);
     }
 
@@ -101,7 +105,7 @@ class Connector extends SaloonConnector implements ConnectorInterface
 
         // Check if this is a rate limit issue
         $rateLimitRemaining = $headers->get('X-RateLimit-Remaining');
-        if ($rateLimitRemaining !== null && (int) $rateLimitRemaining === 0) {
+        if (is_numeric($rateLimitRemaining) && (int) $rateLimitRemaining === 0) {
             return new GitHubRateLimitException('GitHub API rate limit exceeded', $response);
         }
 

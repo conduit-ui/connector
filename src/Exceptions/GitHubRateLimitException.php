@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ConduitUi\GitHubConnector\Exceptions;
 
+use Saloon\Http\Response;
+
 /**
  * Exception thrown when GitHub API rate limit is exceeded.
  */
@@ -17,13 +19,13 @@ class GitHubRateLimitException extends GitHubException
 
     public function __construct(
         string $message = 'GitHub API rate limit exceeded',
-        $response = null,
+        ?Response $response = null,
         int $code = 403,
         ?\Exception $previous = null
     ) {
         parent::__construct($message, $response, $code, $previous);
 
-        if ($response) {
+        if ($response !== null) {
             $this->parseRateLimitHeaders($response);
         }
 
@@ -59,7 +61,7 @@ class GitHubRateLimitException extends GitHubException
      */
     public function getSecondsUntilReset(): ?int
     {
-        if (! $this->resetTime) {
+        if ($this->resetTime === null || $this->resetTime === 0) {
             return null;
         }
 
@@ -69,15 +71,17 @@ class GitHubRateLimitException extends GitHubException
     /**
      * Parse rate limit information from response headers.
      */
-    protected function parseRateLimitHeaders($response): void
+    protected function parseRateLimitHeaders(Response $response): void
     {
-        if (method_exists($response, 'headers')) {
-            $headers = $response->headers();
+        $headers = $response->headers();
 
-            $this->limit = (int) ($headers->get('X-RateLimit-Limit') ?? 0);
-            $this->remaining = (int) ($headers->get('X-RateLimit-Remaining') ?? 0);
-            $this->resetTime = (int) ($headers->get('X-RateLimit-Reset') ?? 0);
-        }
+        $limit = $headers->get('X-RateLimit-Limit');
+        $remaining = $headers->get('X-RateLimit-Remaining');
+        $reset = $headers->get('X-RateLimit-Reset');
+
+        $this->limit = is_numeric($limit) ? (int) $limit : 0;
+        $this->remaining = is_numeric($remaining) ? (int) $remaining : 0;
+        $this->resetTime = is_numeric($reset) ? (int) $reset : 0;
     }
 
     /**
@@ -87,9 +91,9 @@ class GitHubRateLimitException extends GitHubException
     {
         $suggestion = 'Wait for rate limit to reset';
 
-        if ($this->resetTime) {
+        if ($this->resetTime !== null && $this->resetTime > 0) {
             $seconds = $this->getSecondsUntilReset();
-            $minutes = $seconds ? ceil($seconds / 60) : 0;
+            $minutes = $seconds !== null ? (int) ceil($seconds / 60) : 0;
             $resetTime = date('H:i:s', $this->resetTime);
 
             $suggestion .= " at {$resetTime} (~{$minutes} minutes)";

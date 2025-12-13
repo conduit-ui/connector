@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ConduitUi\GitHubConnector\Exceptions;
 
+use Saloon\Http\Response;
+
 /**
  * Exception thrown when GitHub authentication fails.
  */
@@ -11,7 +13,7 @@ class GithubAuthException extends GitHubException
 {
     public function __construct(
         string $message = 'GitHub authentication failed',
-        $response = null,
+        ?Response $response = null,
         int $code = 401,
         ?\Exception $previous = null
     ) {
