@@ -114,7 +114,6 @@ class Connector extends SaloonConnector implements ConnectorInterface
      * this context without requiring the repo to be passed explicitly.
      *
      * @param  string  $repository  Repository in owner/repo format (e.g., 'acme/api')
-     * @return void
      *
      * @throws \InvalidArgumentException If repository format is invalid (missing slash)
      *
@@ -228,7 +227,6 @@ class Connector extends SaloonConnector implements ConnectorInterface
      *
      * After calling this, repo() returns null and requireRepo() throws.
      *
-     * @return void
      *
      * @example
      * ```php
