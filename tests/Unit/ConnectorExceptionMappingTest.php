@@ -1,12 +1,12 @@
 <?php
 
+use ConduitUi\GitHubConnector\Connector;
 use ConduitUi\GitHubConnector\Exceptions\GithubAuthException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubForbiddenException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubRateLimitException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubResourceNotFoundException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubServerException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubValidationException;
-use ConduitUi\GitHubConnector\Connector;
 use Saloon\Enums\Method;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
