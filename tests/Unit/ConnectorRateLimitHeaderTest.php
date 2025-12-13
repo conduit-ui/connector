@@ -1,8 +1,8 @@
 <?php
 
+use ConduitUi\GitHubConnector\Connector;
 use ConduitUi\GitHubConnector\Exceptions\GitHubForbiddenException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubRateLimitException;
-use ConduitUi\GitHubConnector\Connector;
 use Saloon\Enums\Method;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
