@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ConduitUi\GitHubConnector\Exceptions;
+
+use Saloon\Http\Response;
 
 /**
  * Exception thrown when access to a GitHub resource is forbidden.
@@ -9,7 +13,7 @@ class GitHubForbiddenException extends GitHubException
 {
     public function __construct(
         string $message = 'Access to GitHub resource is forbidden',
-        $response = null,
+        ?Response $response = null,
         int $code = 403,
         ?\Exception $previous = null
     ) {
