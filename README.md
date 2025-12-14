@@ -2,7 +2,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/conduit-ui/connector.svg?style=flat-square)](https://packagist.org/packages/conduit-ui/connector)
 [![Total Downloads](https://img.shields.io/packagist/dt/conduit-ui/connector.svg?style=flat-square)](https://packagist.org/packages/conduit-ui/connector)
-[![CI](https://img.shields.io/github/actions/workflow/status/conduit-ui/connector/tests.yml?branch=master&label=CI&style=flat-square)](https://github.com/conduit-ui/connector/actions)
+[![Sentinel Certified](https://img.shields.io/github/actions/workflow/status/conduit-ui/connector/gate.yml?label=Sentinel%20Certified&style=flat-square)](https://github.com/conduit-ui/connector/actions/workflows/gate.yml)
 [![License](https://img.shields.io/packagist/l/conduit-ui/connector.svg?style=flat-square)](https://packagist.org/packages/conduit-ui/connector)
 
 Stop wrestling with GitHub API authentication and error handling. Start with a clean HTTP transport layer that maps GitHub's API responses to typed exceptions automatically.
