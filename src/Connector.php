@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ConduitUi\GitHubConnector;
 
 use ConduitUi\GitHubConnector\Contracts\ConnectorInterface;
@@ -9,6 +11,7 @@ use ConduitUi\GitHubConnector\Exceptions\GitHubRateLimitException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubResourceNotFoundException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubServerException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubValidationException;
+use ConduitUi\GitHubConnector\Exceptions\NoRepoContextException;
 use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector as SaloonConnector;
 use Saloon\Http\Response;
@@ -22,6 +25,11 @@ class Connector extends SaloonConnector implements ConnectorInterface
     use AcceptsJson;
 
     protected ?string $token;
+
+    /**
+     * Static repository context (owner/repo format).
+     */
+    protected static ?string $currentRepo = null;
 
     /**
      * Create a new GitHub connector instance.
@@ -97,5 +105,138 @@ class Connector extends SaloonConnector implements ConnectorInterface
         }
 
         return new GitHubForbiddenException('Access to GitHub resource is forbidden', $response);
+    }
+
+    /**
+     * Set the current repository context.
+     *
+     * Once set, all ecosystem packages (issue, pr, commit, etc.) can access
+     * this context without requiring the repo to be passed explicitly.
+     *
+     * @param  string  $repository  Repository in owner/repo format (e.g., 'acme/api')
+     *
+     * @throws \InvalidArgumentException If repository format is invalid (missing slash)
+     *
+     * @example
+     * ```php
+     * Connector::forRepo('conduit-ui/connector');
+     *
+     * // Now all packages inherit this context
+     * Issue::all();           // Issues from conduit-ui/connector
+     * PullRequests::open();   // PRs from conduit-ui/connector
+     * ```
+     */
+    public static function forRepo(string $repository): void
+    {
+        if (! str_contains($repository, '/')) {
+            throw new \InvalidArgumentException('Repository must be in owner/repo format');
+        }
+
+        static::$currentRepo = $repository;
+    }
+
+    /**
+     * Get the current repository context, or null if not set.
+     *
+     * Use this when you want to check if a context exists without throwing.
+     *
+     * @return string|null The repository in owner/repo format, or null if not set
+     *
+     * @example
+     * ```php
+     * if (Connector::repo() !== null) {
+     *     $owner = Connector::owner();
+     * }
+     * ```
+     */
+    public static function repo(): ?string
+    {
+        return static::$currentRepo;
+    }
+
+    /**
+     * Get the current repository context, or throw if not set.
+     *
+     * Use this when the repo context is required for the operation to proceed.
+     *
+     * @return string The repository in owner/repo format
+     *
+     * @throws NoRepoContextException If no repository context is set
+     *
+     * @example
+     * ```php
+     * try {
+     *     $repo = Connector::requireRepo();
+     * } catch (NoRepoContextException $e) {
+     *     // Handle missing context
+     * }
+     * ```
+     */
+    public static function requireRepo(): string
+    {
+        return static::$currentRepo
+            ?? throw new NoRepoContextException;
+    }
+
+    /**
+     * Get the owner from the current repository context.
+     *
+     * Extracts the owner portion from the 'owner/repo' format.
+     *
+     * @return string The repository owner (e.g., 'conduit-ui' from 'conduit-ui/connector')
+     *
+     * @throws NoRepoContextException If no repository context is set
+     *
+     * @example
+     * ```php
+     * Connector::forRepo('conduit-ui/connector');
+     * echo Connector::owner(); // 'conduit-ui'
+     * ```
+     */
+    public static function owner(): string
+    {
+        [$owner] = explode('/', static::requireRepo(), 2);
+
+        return $owner;
+    }
+
+    /**
+     * Get the repository name from the current repository context.
+     *
+     * Extracts the repo portion from the 'owner/repo' format.
+     *
+     * @return string The repository name (e.g., 'connector' from 'conduit-ui/connector')
+     *
+     * @throws NoRepoContextException If no repository context is set
+     *
+     * @example
+     * ```php
+     * Connector::forRepo('conduit-ui/connector');
+     * echo Connector::repoName(); // 'connector'
+     * ```
+     */
+    public static function repoName(): string
+    {
+        [, $repo] = explode('/', static::requireRepo(), 2);
+
+        return $repo;
+    }
+
+    /**
+     * Clear the current repository context.
+     *
+     * After calling this, repo() returns null and requireRepo() throws.
+     *
+     *
+     * @example
+     * ```php
+     * Connector::forRepo('owner/repo');
+     * Connector::clearRepo();
+     * Connector::repo(); // null
+     * ```
+     */
+    public static function clearRepo(): void
+    {
+        static::$currentRepo = null;
     }
 }
