@@ -83,13 +83,6 @@ class Connector extends SaloonConnector implements ConnectorInterface
         };
     }
 
-    /**
-     * Determine if the request should be considered failed.
-     */
-    public function hasRequestFailed(Response $response): bool
-    {
-        return $response->failed();
-    }
 
     /**
      * Handle 403 responses which could be rate limiting or permissions.
