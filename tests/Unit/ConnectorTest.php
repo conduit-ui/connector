@@ -107,3 +107,4 @@ it('can send requests successfully', function () {
     expect($response->json())->toBe(['success' => true])
         ->and($response->status())->toBe(200);
 });
+
