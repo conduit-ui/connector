@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ConduitUi\GitHubConnector;
 
+use ConduitUi\GitHubConnector\Auth\AuthenticationStrategy;
+use ConduitUi\GitHubConnector\Auth\TokenAuthentication;
 use ConduitUi\GitHubConnector\Contracts\ConnectorInterface;
 use ConduitUi\GitHubConnector\Exceptions\GithubAuthException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubForbiddenException;
@@ -12,7 +14,7 @@ use ConduitUi\GitHubConnector\Exceptions\GitHubResourceNotFoundException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubServerException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubValidationException;
 use ConduitUi\GitHubConnector\Exceptions\NoRepoContextException;
-use Saloon\Http\Auth\TokenAuthenticator;
+use Saloon\Contracts\Authenticator;
 use Saloon\Http\Connector as SaloonConnector;
 use Saloon\Http\Response;
 use Saloon\Traits\Plugins\AcceptsJson;
@@ -24,7 +26,7 @@ class Connector extends SaloonConnector implements ConnectorInterface
 {
     use AcceptsJson;
 
-    protected ?string $token;
+    private readonly ?AuthenticationStrategy $authStrategy;
 
     /**
      * Static repository context (owner/repo format).
@@ -34,11 +36,15 @@ class Connector extends SaloonConnector implements ConnectorInterface
     /**
      * Create a new GitHub connector instance.
      *
-     * @param  string|null  $token  GitHub personal access token
+     * @param  AuthenticationStrategy|string|null  $authentication  Authentication strategy or token string (for backward compatibility)
      */
-    public function __construct(?string $token = null)
+    public function __construct(AuthenticationStrategy|string|null $authentication = null)
     {
-        $this->token = $token;
+        $this->authStrategy = match (true) {
+            $authentication instanceof AuthenticationStrategy => $authentication,
+            is_string($authentication) => new TokenAuthentication($authentication),
+            default => null,
+        };
     }
 
     /**
@@ -52,9 +58,9 @@ class Connector extends SaloonConnector implements ConnectorInterface
     /**
      * Configure default authentication for requests.
      */
-    protected function defaultAuth(): TokenAuthenticator
+    protected function defaultAuth(): ?Authenticator
     {
-        return new TokenAuthenticator($this->token);
+        return $this->authStrategy?->getAuthenticator();
     }
 
     /**
