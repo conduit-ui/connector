@@ -345,3 +345,34 @@ it('handles polling error without description', function () {
     $auth = new DeviceFlowAuthentication('client_id', $callback, null, $httpClient);
     $auth->authorize();
 })->throws(DeviceFlowException::class, 'Unknown error');
+
+it('throws expired exception when device code expires', function () {
+    $callback = new TestDeviceFlowCallback;
+    $httpClient = new MockDeviceFlowHttpClient;
+
+    // Device code with very short expiration (1 second)
+    $httpClient->addResponse([
+        'device_code' => 'abc123',
+        'user_code' => 'ABCD-1234',
+        'verification_uri' => 'https://github.com/login/device',
+        'expires_in' => 1,
+        'interval' => 0,
+    ]);
+
+    // Return empty responses (no access_token, no error) to keep loop running
+    // until expiration
+    $httpClient->addResponse([]);
+    $httpClient->addResponse([]);
+    $httpClient->addResponse([]);
+
+    $auth = new DeviceFlowAuthentication('client_id', $callback, null, $httpClient);
+
+    try {
+        $auth->authorize();
+    } catch (DeviceFlowException $e) {
+        expect($callback->error)->toBe('expired_token')
+            ->and($e->getError())->toBe('expired_token');
+
+        throw $e;
+    }
+})->throws(DeviceFlowException::class, 'The device code has expired. Please restart the authentication flow.');
