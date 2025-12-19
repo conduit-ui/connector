@@ -109,6 +109,32 @@ it('can be instantiated with optional scope', function () {
     expect($auth)->toBeInstanceOf(DeviceFlowAuthentication::class);
 });
 
+it('includes scope in device code request when provided', function () {
+    $callback = new TestDeviceFlowCallback;
+    $httpClient = new MockDeviceFlowHttpClient;
+
+    $httpClient->addResponse([
+        'device_code' => 'abc123',
+        'user_code' => 'ABCD-1234',
+        'verification_uri' => 'https://github.com/login/device',
+        'expires_in' => 900,
+        'interval' => 5,
+    ]);
+
+    $httpClient->addResponse([
+        'access_token' => 'gho_test_token',
+        'token_type' => 'bearer',
+        'scope' => 'repo user',
+    ]);
+
+    // Pass scope to constructor
+    $auth = new DeviceFlowAuthentication('client_id', $callback, 'repo user', $httpClient);
+    $auth->authorize();
+
+    expect($auth->isAuthorized())->toBeTrue()
+        ->and($callback->scope)->toBe('repo user');
+});
+
 it('can be instantiated with custom HTTP client', function () {
     $callback = new TestDeviceFlowCallback;
     $httpClient = new MockDeviceFlowHttpClient;
