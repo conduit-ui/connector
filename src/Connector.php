@@ -89,7 +89,6 @@ class Connector extends SaloonConnector implements ConnectorInterface
         };
     }
 
-
     /**
      * Handle 403 responses which could be rate limiting or permissions.
      */
