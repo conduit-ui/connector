@@ -18,7 +18,7 @@ interface DeviceFlowHttpClient
      *
      * @param  string  $url  The URL to post to
      * @param  array<string, string>  $params  Form parameters
-     * @return array<string, mixed>  Decoded JSON response
+     * @return array<string, mixed> Decoded JSON response
      *
      * @throws DeviceFlowException If the request fails
      */

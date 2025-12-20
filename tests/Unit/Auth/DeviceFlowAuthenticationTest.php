@@ -70,7 +70,7 @@ class MockDeviceFlowHttpClient implements DeviceFlowHttpClient
     public int $lastSleepSeconds = 0;
 
     /**
-     * @param array<string, mixed> $response
+     * @param  array<string, mixed>  $response
      */
     public function addResponse(array $response): self
     {

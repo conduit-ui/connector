@@ -46,6 +46,7 @@ describe('GitHubRateLimitException', function () {
         $request = new class extends Request
         {
             protected Method $method = Method::GET;
+
             public function resolveEndpoint(): string
             {
                 return '/test';
@@ -76,6 +77,7 @@ describe('GitHubRateLimitException', function () {
         $request = new class extends Request
         {
             protected Method $method = Method::GET;
+
             public function resolveEndpoint(): string
             {
                 return '/test';
@@ -110,6 +112,7 @@ describe('GitHubRateLimitException', function () {
         $request = new class extends Request
         {
             protected Method $method = Method::GET;
+
             public function resolveEndpoint(): string
             {
                 return '/test';
@@ -157,6 +160,7 @@ describe('GitHubValidationException', function () {
         $request = new class extends Request
         {
             protected Method $method = Method::POST;
+
             public function resolveEndpoint(): string
             {
                 return '/test';
@@ -189,6 +193,7 @@ describe('GitHubValidationException', function () {
         $request = new class extends Request
         {
             protected Method $method = Method::POST;
+
             public function resolveEndpoint(): string
             {
                 return '/test';
@@ -212,6 +217,7 @@ describe('GitHubValidationException', function () {
         $request = new class extends Request
         {
             protected Method $method = Method::POST;
+
             public function resolveEndpoint(): string
             {
                 return '/test';
@@ -244,6 +250,7 @@ describe('GitHubValidationException', function () {
         $request = new class extends Request
         {
             protected Method $method = Method::POST;
+
             public function resolveEndpoint(): string
             {
                 return '/test';
@@ -278,6 +285,7 @@ describe('getDetailedMessage', function () {
         $request = new class extends Request
         {
             protected Method $method = Method::GET;
+
             public function resolveEndpoint(): string
             {
                 return '/test';
@@ -309,6 +317,7 @@ describe('getDetailedMessage', function () {
         $request = new class extends Request
         {
             protected Method $method = Method::GET;
+
             public function resolveEndpoint(): string
             {
                 return '/test';

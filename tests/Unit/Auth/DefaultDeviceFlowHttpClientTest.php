@@ -31,10 +31,8 @@ it('sleep method executes without error', function () {
  */
 class MockHttpStreamWrapper
 {
-    /** @var string */
     public static string $mockResponse = '{}';
 
-    /** @var int */
     private int $position = 0;
 
     /** @var resource|null */
