@@ -1,19 +1,22 @@
 # Connector - GitHub API Without the Guesswork
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/conduit-ui/connector.svg?style=flat-square)](https://packagist.org/packages/conduit-ui/connector)
-[![Total Downloads](https://img.shields.io/packagist/dt/conduit-ui/connector.svg?style=flat-square)](https://packagist.org/packages/conduit-ui/connector)
-[![Sentinel Certified](https://img.shields.io/github/actions/workflow/status/conduit-ui/connector/gate.yml?label=Sentinel%20Certified&style=flat-square)](https://github.com/conduit-ui/connector/actions/workflows/gate.yml)
-[![License](https://img.shields.io/packagist/l/conduit-ui/connector.svg?style=flat-square)](https://packagist.org/packages/conduit-ui/connector)
+[![Latest Version](https://img.shields.io/packagist/v/conduit-ui/connector.svg)](https://packagist.org/packages/conduit-ui/connector)
+[![Total Downloads](https://img.shields.io/packagist/dt/conduit-ui/connector.svg)](https://packagist.org/packages/conduit-ui/connector)
+[![PHP Version](https://img.shields.io/packagist/php-v/conduit-ui/connector.svg)](https://packagist.org/packages/conduit-ui/connector)
+[![Tests](https://github.com/conduit-ui/connector/actions/workflows/gate.yml/badge.svg)](https://github.com/conduit-ui/connector/actions/workflows/gate.yml)
+[![License](https://img.shields.io/github/license/conduit-ui/connector.svg)](LICENSE)
 
 Stop wrestling with GitHub API authentication and error handling. Start with a clean HTTP transport layer that maps GitHub's API responses to typed exceptions automatically.
 
 **Perfect for:** Building GitHub integrations, creating developer tools, automating repository workflows
 
-## Quick Start
+## Installation
 
 ```bash
 composer require conduit-ui/connector
 ```
+
+## Quick Start
 
 ```php
 use ConduitUi\GitHubConnector\Connector;

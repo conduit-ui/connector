@@ -5,7 +5,9 @@
     "conduit-ui",
     "github",
     "api",
-    "connector"
+    "connector",
+    "agents",
+    "automation"
   ],
   "homepage": "https://github.com/conduit-ui/github-connector",
   "license": "MIT",
