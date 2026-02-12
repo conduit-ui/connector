@@ -1,33 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ConduitUi\GitHubConnector\Exceptions;
 
 use Exception;
+use Saloon\Http\Response;
 
 /**
  * Base exception for all GitHub API errors.
  */
 class GitHubException extends Exception
 {
-    protected $response = null;
+    protected ?Response $response = null;
 
     protected ?array $githubError = null;
 
     protected ?string $recoverySuggestion = null;
 
-    /**
-     * Create a new GitHub exception.
-     *
-     * @param  string  $message  Exception message
-     * @param  mixed  $response  The HTTP response that caused the exception
-     * @param  int  $code  Exception code
-     * @param  Exception|null  $previous  Previous exception
-     */
     public function __construct(
         string $message = '',
-        $response = null,
+        ?Response $response = null,
         int $code = 0,
-        ?Exception $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
 
@@ -38,10 +33,7 @@ class GitHubException extends Exception
         }
     }
 
-    /**
-     * Get the HTTP response that caused this exception.
-     */
-    public function getResponse()
+    public function getResponse(): ?Response
     {
         return $this->response;
     }
@@ -73,7 +65,7 @@ class GitHubException extends Exception
     /**
      * Parse GitHub error details from the response.
      */
-    protected function parseGitHubError($response): void
+    protected function parseGitHubError(Response $response): void
     {
         if (method_exists($response, 'json')) {
             $body = $response->json();
