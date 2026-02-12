@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ConduitUi\GitHubConnector\Exceptions;
+
+use Saloon\Http\Response;
 
 /**
  * Exception thrown when GitHub API rate limit is exceeded.
@@ -15,9 +19,9 @@ class GitHubRateLimitException extends GitHubException
 
     public function __construct(
         string $message = 'GitHub API rate limit exceeded',
-        $response = null,
+        ?Response $response = null,
         int $code = 403,
-        ?\Exception $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($message, $response, $code, $previous);
 
@@ -67,7 +71,7 @@ class GitHubRateLimitException extends GitHubException
     /**
      * Parse rate limit information from response headers.
      */
-    protected function parseRateLimitHeaders($response): void
+    protected function parseRateLimitHeaders(Response $response): void
     {
         if (method_exists($response, 'headers')) {
             $headers = $response->headers();

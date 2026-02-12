@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ConduitUi\GitHubConnector\Exceptions;
+
+use Saloon\Http\Response;
 
 /**
  * Exception thrown when GitHub API validation fails.
@@ -11,9 +15,9 @@ class GitHubValidationException extends GitHubException
 
     public function __construct(
         string $message = 'GitHub API validation failed',
-        $response = null,
+        ?Response $response = null,
         int $code = 422,
-        ?\Exception $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($message, $response, $code, $previous);
 
@@ -37,7 +41,7 @@ class GitHubValidationException extends GitHubException
     /**
      * Parse validation errors from the GitHub response.
      */
-    protected function parseValidationErrors($response): void
+    protected function parseValidationErrors(Response $response): void
     {
         if (method_exists($response, 'json')) {
             $body = $response->json();
