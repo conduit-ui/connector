@@ -14,6 +14,8 @@ use ConduitUi\GitHubConnector\Exceptions\GitHubResourceNotFoundException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubServerException;
 use ConduitUi\GitHubConnector\Exceptions\GitHubValidationException;
 use ConduitUi\GitHubConnector\Exceptions\NoRepoContextException;
+use ConduitUi\GitHubConnector\RateLimit\HasRateLimiting;
+use ConduitUi\GitHubConnector\RateLimit\RateLimitConfig;
 use Saloon\Contracts\Authenticator;
 use Saloon\Http\Connector as SaloonConnector;
 use Saloon\Http\Response;
@@ -25,6 +27,7 @@ use Saloon\Traits\Plugins\AcceptsJson;
 class Connector extends SaloonConnector implements ConnectorInterface
 {
     use AcceptsJson;
+    use HasRateLimiting;
 
     private readonly ?AuthenticationStrategy $authStrategy;
 
@@ -37,14 +40,23 @@ class Connector extends SaloonConnector implements ConnectorInterface
      * Create a new GitHub connector instance.
      *
      * @param  AuthenticationStrategy|string|null  $authentication  Authentication strategy or token string (for backward compatibility)
+     * @param  RateLimitConfig|null  $rateLimitConfig  Optional rate limiting configuration. Defaults to null, meaning automatic retry is disabled (the connector still tracks rate-limit headers via {@see rateLimitState()}). Pass a {@see RateLimitConfig} instance, or call {@see withRateLimiting()} afterwards, to opt into retry behavior.
      */
-    public function __construct(AuthenticationStrategy|string|null $authentication = null)
-    {
+    public function __construct(
+        AuthenticationStrategy|string|null $authentication = null,
+        ?RateLimitConfig $rateLimitConfig = null,
+    ) {
         $this->authStrategy = match (true) {
             $authentication instanceof AuthenticationStrategy => $authentication,
             is_string($authentication) => new TokenAuthentication($authentication),
             default => null,
         };
+
+        $this->initializeRateLimiting();
+
+        if ($rateLimitConfig !== null) {
+            $this->withRateLimiting($rateLimitConfig);
+        }
     }
 
     /**
@@ -76,9 +88,19 @@ class Connector extends SaloonConnector implements ConnectorInterface
 
     /**
      * Handle GitHub-specific exceptions based on response status.
+     *
+     * When rate limiting is enabled, retryable statuses (rate limit 403, 5xx)
+     * return null to let Saloon create a standard RequestException that can be
+     * caught by the retry loop. Non-retryable errors always return custom exceptions.
      */
     public function getRequestException(Response $response, ?\Throwable $senderException = null): ?\Throwable
     {
+        // When retry is enabled, let retryable errors use Saloon's RequestException
+        // so the retry loop can catch them. Custom exceptions bypass the loop.
+        if ($this->hasRateLimitingEnabled() && $this->isRetryableStatus($response)) {
+            return null;
+        }
+
         return match ($response->status()) {
             401 => new GithubAuthException('GitHub authentication failed', $response),
             403 => $this->handleForbiddenResponse($response),
