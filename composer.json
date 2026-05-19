@@ -20,7 +20,7 @@
   ],
   "require": {
     "php": "^8.2|^8.3|^8.4",
-    "saloonphp/saloon": "^3.10"
+    "saloonphp/saloon": "^4.0"
   },
   "require-dev": {
     "laravel/pail": "^1.2",
