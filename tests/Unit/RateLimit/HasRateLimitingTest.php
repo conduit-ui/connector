@@ -388,6 +388,64 @@ it('returns last response after max retries when throwOnMaxRetries is false', fu
     expect($response->status())->toBe(403);
 });
 
+it('updates rate limit state on successful responses (no retry enabled)', function () {
+    $connector = new Connector('test-token');
+
+    $request = new class extends Request
+    {
+        protected Method $method = Method::GET;
+
+        public function resolveEndpoint(): string
+        {
+            return '/user';
+        }
+    };
+
+    $mockClient = new MockClient([
+        MockResponse::make(['login' => 'test'], 200, [
+            'X-RateLimit-Limit' => '5000',
+            'X-RateLimit-Remaining' => '4999',
+            'X-RateLimit-Used' => '1',
+        ]),
+    ]);
+
+    $connector->withMockClient($mockClient);
+    $connector->send($request);
+
+    $state = $connector->rateLimitState();
+    expect($state->getLimit())->toBe(5000)
+        ->and($state->getRemaining())->toBe(4999)
+        ->and($state->getUsed())->toBe(1);
+});
+
+it('updates rate limit state on successful responses when retry is enabled', function () {
+    $connector = new Connector('test-token', new RateLimitConfig(retryAttempts: 3, retryDelay: 0));
+
+    $request = new class extends Request
+    {
+        protected Method $method = Method::GET;
+
+        public function resolveEndpoint(): string
+        {
+            return '/user';
+        }
+    };
+
+    $mockClient = new MockClient([
+        MockResponse::make(['login' => 'test'], 200, [
+            'X-RateLimit-Limit' => '5000',
+            'X-RateLimit-Remaining' => '4998',
+        ]),
+    ]);
+
+    $connector->withMockClient($mockClient);
+    $connector->send($request);
+
+    $state = $connector->rateLimitState();
+    expect($state->getLimit())->toBe(5000)
+        ->and($state->getRemaining())->toBe(4998);
+});
+
 it('updates rate limit state during retry', function () {
     $connector = new Connector('test-token');
     $connector->withRateLimiting(new RateLimitConfig(

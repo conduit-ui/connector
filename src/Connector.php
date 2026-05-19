@@ -40,7 +40,7 @@ class Connector extends SaloonConnector implements ConnectorInterface
      * Create a new GitHub connector instance.
      *
      * @param  AuthenticationStrategy|string|null  $authentication  Authentication strategy or token string (for backward compatibility)
-     * @param  RateLimitConfig|null  $rateLimitConfig  Rate limiting configuration (defaults to enabled with 3 retries)
+     * @param  RateLimitConfig|null  $rateLimitConfig  Optional rate limiting configuration. Defaults to null, meaning automatic retry is disabled (the connector still tracks rate-limit headers via {@see rateLimitState()}). Pass a {@see RateLimitConfig} instance, or call {@see withRateLimiting()} afterwards, to opt into retry behavior.
      */
     public function __construct(
         AuthenticationStrategy|string|null $authentication = null,

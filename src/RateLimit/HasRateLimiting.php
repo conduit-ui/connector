@@ -6,6 +6,7 @@ namespace ConduitUi\GitHubConnector\RateLimit;
 
 use Saloon\Exceptions\Request\FatalRequestException;
 use Saloon\Exceptions\Request\RequestException;
+use Saloon\Http\PendingRequest;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
 
@@ -64,7 +65,10 @@ trait HasRateLimiting
     /**
      * Determine if a failed request should be retried.
      *
-     * Only retries rate limit errors and server errors (5xx).
+     * Only retries rate limit errors and server errors (5xx). Rate limit state
+     * is refreshed for every response (success and failure) via the response
+     * middleware registered in {@see bootHasRateLimiting()}, so this method
+     * does not need to update state itself.
      */
     public function handleRetry(FatalRequestException|RequestException $exception, Request $request): bool
     {
@@ -76,10 +80,7 @@ trait HasRateLimiting
             return true;
         }
 
-        $response = $exception->getResponse();
-        $this->rateLimitState()->updateFromResponse($response);
-
-        return $this->isRetryableStatus($response);
+        return $this->isRetryableStatus($exception->getResponse());
     }
 
     /**
@@ -122,11 +123,33 @@ trait HasRateLimiting
     /**
      * Initialize the rate limiting trait.
      *
-     * Named to avoid collision with Saloon's auto-boot mechanism
-     * which calls boot{TraitName}(PendingRequest).
+     * Called from the connector constructor to ensure {@see $rateLimitState}
+     * is always available. The per-request lifecycle wiring is handled by
+     * {@see bootHasRateLimiting()}.
      */
     protected function initializeRateLimiting(): void
     {
         $this->rateLimitState = new RateLimitState;
+    }
+
+    /**
+     * Saloon lifecycle hook invoked once per outgoing request.
+     *
+     * Registers a response middleware so that {@see RateLimitState::updateFromResponse()}
+     * runs for every response, regardless of HTTP status. Retry decisions still
+     * flow through {@see handleRetry()}; this hook only keeps state in sync.
+     */
+    public function bootHasRateLimiting(PendingRequest $pendingRequest): void
+    {
+        $state = $this->rateLimitState();
+
+        $pendingRequest->middleware()->onResponse(
+            static function (Response $response) use ($state): Response {
+                $state->updateFromResponse($response);
+
+                return $response;
+            },
+            'updateRateLimitState',
+        );
     }
 }
