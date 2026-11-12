@@ -1,0 +1,18 @@
+* text=auto eol=lf
+
+.claude/                    export-ignore
+.claude/commands/           export-ignore
+.claude/settings.local.json export-ignore
+.editorconfig               export-ignore
+.gitattributes              export-ignore
+.github/                    export-ignore
+.gitignore                  export-ignore
+.phpactor.json              export-ignore
+CHANGELOG.md                export-ignore
+composer.lock               export-ignore
+CONTRIBUTING.md             export-ignore
+phpstan.neon                export-ignore
+phpunit.xml                 export-ignore
+README.md                   export-ignore
+tests/                      export-ignore
+vendor/                     export-ignore
