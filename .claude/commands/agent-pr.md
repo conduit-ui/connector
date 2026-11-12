@@ -46,6 +46,6 @@ gh pr create --title "<title>" --body "<body>"
 ### Step 5: Report
 ```
 [PR] Created PR #12: feat: Add markdown rendering (fixes #1)
-[PR] URL: https://github.com/jordanpartridge/chat/pull/12
+[PR] URL: https://github.com/shadetheory/chat/pull/12
 [PR] Linked to issue #1
 ```
